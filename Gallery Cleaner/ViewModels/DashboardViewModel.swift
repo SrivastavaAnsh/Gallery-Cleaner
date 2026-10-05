@@ -23,6 +23,8 @@ final class DashboardViewModel: ObservableObject {
     
     private let photoManager = PhotoLibraryManager.shared
     private let duplicateDetector = DuplicateDetector()
+    private let duplicatePhotoAnalysisService = DuplicatePhotoAnalysisService()
+    private let duplicateVideoAnalysisService = DuplicateVideoAnalysisService()
     private let similarDetector = SimilarPhotosDetector()
     private var cancellables = Set<AnyCancellable>()
     
@@ -83,17 +85,17 @@ final class DashboardViewModel: ObservableObject {
         self.categoryCounts[.videos] = videoItems.count
         self.categorySizes[.videos] = videoItems.reduce(0) { $0 + $1.fileSize }
         
-        // Large Videos: sorted descending by storage size
+        // Large Videos: sorted descending by storage size (largest to smallest)
         let sortedLarge = videoItems.sorted { $0.fileSize > $1.fileSize }
-        self.largeVideos = Array(sortedLarge.prefix(50))
+        self.largeVideos = sortedLarge
         self.categoryCounts[.largeVideos] = self.largeVideos.count
         self.categorySizes[.largeVideos] = self.largeVideos.reduce(0) { $0 + $1.fileSize }
         
         scanProgress = 0.3
         
-        // Step 2: Background Duplicate Photo Detection
+        // Step 2: Background Content-Based Duplicate Photo Analysis
         scanStatusText = "Detecting duplicate photos..."
-        let photoDupGroups = await duplicateDetector.findDuplicatePhotos(from: photoAssets) { [weak self] progress in
+        let photoDupGroups = await duplicatePhotoAnalysisService.findDuplicatePhotos(from: photoAssets) { [weak self] progress in
             Task { @MainActor in
                 self?.scanProgress = 0.3 + (progress * 0.25)
             }
@@ -102,9 +104,9 @@ final class DashboardViewModel: ObservableObject {
         self.categoryCounts[.duplicatePhotos] = photoDupGroups.reduce(0) { $0 + $1.items.count }
         self.categorySizes[.duplicatePhotos] = photoDupGroups.reduce(0) { $0 + $1.reclaimableSize }
         
-        // Step 3: Background Duplicate Video Detection
+        // Step 3: Background Content-Based Duplicate Video Analysis
         scanStatusText = "Detecting duplicate videos..."
-        let videoDupGroups = await duplicateDetector.findDuplicateVideos(from: videoAssets) { [weak self] progress in
+        let videoDupGroups = await duplicateVideoAnalysisService.findDuplicateVideos(from: videoAssets) { [weak self] progress in
             Task { @MainActor in
                 self?.scanProgress = 0.55 + (progress * 0.15)
             }
