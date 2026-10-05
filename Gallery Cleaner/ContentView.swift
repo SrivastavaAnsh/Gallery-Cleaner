@@ -1,25 +1,21 @@
 import SwiftUI
-import Playgrounds
 
-@main struct MyApp: App {
+@main 
+struct GalleryCleanerApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            DashboardView()
         }
     }
 }
 
 struct ContentView: View {
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        DashboardView()
     }
 }
 
 #Preview {
-    ContentView()
+    DashboardView()
 }
 
-#Playground {
-    _ = 1 + 2
-}
