@@ -25,7 +25,7 @@ final class DashboardViewModel: ObservableObject {
     private let duplicateDetector = DuplicateDetector()
     private let duplicatePhotoAnalysisService = DuplicatePhotoAnalysisService()
     private let duplicateVideoAnalysisService = DuplicateVideoAnalysisService()
-    private let similarDetector = SimilarPhotosDetector()
+    private let similarPhotoAnalysisService = SimilarPhotoAnalysisService(similarityThreshold: 12.0)
     private var cancellables = Set<AnyCancellable>()
     
     init() {
@@ -59,6 +59,57 @@ final class DashboardViewModel: ObservableObject {
         if state.canReadGallery {
             await startScan()
         }
+    }
+    
+    /// Immediately updates cached media lists, category counts, and sizes when assets are deleted
+    func handleAssetsDeleted(deletedIDs: Set<String>) {
+        guard !deletedIDs.isEmpty else { return }
+        
+        // 1. Remove deleted items from flat lists
+        screenshots.removeAll { deletedIDs.contains($0.id) }
+        videos.removeAll { deletedIDs.contains($0.id) }
+        largeVideos.removeAll { deletedIDs.contains($0.id) }
+        
+        // 2. Remove deleted items from grouped lists
+        for gIndex in (0..<duplicatePhotoGroups.count).reversed() {
+            duplicatePhotoGroups[gIndex].items.removeAll { deletedIDs.contains($0.id) }
+            if duplicatePhotoGroups[gIndex].items.count <= 1 {
+                duplicatePhotoGroups.remove(at: gIndex)
+            }
+        }
+        
+        for gIndex in (0..<duplicateVideoGroups.count).reversed() {
+            duplicateVideoGroups[gIndex].items.removeAll { deletedIDs.contains($0.id) }
+            if duplicateVideoGroups[gIndex].items.count <= 1 {
+                duplicateVideoGroups.remove(at: gIndex)
+            }
+        }
+        
+        for gIndex in (0..<similarPhotoGroups.count).reversed() {
+            similarPhotoGroups[gIndex].items.removeAll { deletedIDs.contains($0.id) }
+            if similarPhotoGroups[gIndex].items.count <= 1 {
+                similarPhotoGroups.remove(at: gIndex)
+            }
+        }
+        
+        // 3. Recalculate category counts and sizes
+        categoryCounts[.screenshots] = screenshots.count
+        categorySizes[.screenshots] = screenshots.reduce(0) { $0 + $1.fileSize }
+        
+        categoryCounts[.videos] = videos.count
+        categorySizes[.videos] = videos.reduce(0) { $0 + $1.fileSize }
+        
+        categoryCounts[.largeVideos] = largeVideos.count
+        categorySizes[.largeVideos] = largeVideos.reduce(0) { $0 + $1.fileSize }
+        
+        categoryCounts[.duplicatePhotos] = duplicatePhotoGroups.reduce(0) { $0 + $1.items.count }
+        categorySizes[.duplicatePhotos] = duplicatePhotoGroups.reduce(0) { $0 + $1.reclaimableSize }
+        
+        categoryCounts[.duplicateVideos] = duplicateVideoGroups.reduce(0) { $0 + $1.items.count }
+        categorySizes[.duplicateVideos] = duplicateVideoGroups.reduce(0) { $0 + $1.reclaimableSize }
+        
+        categoryCounts[.similarPhotos] = similarPhotoGroups.reduce(0) { $0 + $1.items.count }
+        categorySizes[.similarPhotos] = similarPhotoGroups.reduce(0) { $0 + $1.reclaimableSize }
     }
     
     func startScan() async {
@@ -117,7 +168,11 @@ final class DashboardViewModel: ObservableObject {
         
         // Step 4: Background Similar Photos Detection (Vision framework)
         scanStatusText = "Analyzing similar photos..."
-        let simGroups = await similarDetector.findSimilarPhotos(from: photoAssets) { [weak self] progress in
+        let exactDuplicateAssetIDs = Set(photoDupGroups.flatMap { $0.items.map(\.id) })
+        let simGroups = await similarPhotoAnalysisService.findSimilarPhotos(
+            from: photoAssets,
+            exactDuplicateIDs: exactDuplicateAssetIDs
+        ) { [weak self] progress in
             Task { @MainActor in
                 self?.scanProgress = 0.70 + (progress * 0.30)
             }

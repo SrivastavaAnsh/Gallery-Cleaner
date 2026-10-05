@@ -13,15 +13,17 @@ final class CategoryDetailViewModel: ObservableObject {
     @Published var isDeleting: Bool = false
     @Published var errorMessage: String? = nil
     @Published var selectedPreviewItem: MediaItem? = nil
+    var onAssetsDeleted: ((Set<String>) -> Void)? = nil
     
     private let photoManager = PhotoLibraryManager.shared
     
-    init(category: CategoryType, items: [MediaItem] = [], groups: [MediaGroup] = [], isScanning: Bool = false, isAuthorized: Bool = true) {
+    init(category: CategoryType, items: [MediaItem] = [], groups: [MediaGroup] = [], isScanning: Bool = false, isAuthorized: Bool = true, onAssetsDeleted: ((Set<String>) -> Void)? = nil) {
         self.category = category
         self.items = items
         self.groups = groups
         self.isScanning = isScanning
         self.isAuthorized = isAuthorized
+        self.onAssetsDeleted = onAssetsDeleted
         
         // Auto-select smart defaults for duplicate groups (keep first/newest item unselected, mark others selected)
         if !groups.isEmpty {
@@ -137,6 +139,8 @@ final class CategoryDetailViewModel: ObservableObject {
                 } else {
                     items.removeAll { deletedIDs.contains($0.id) }
                 }
+                onAssetsDeleted?(deletedIDs)
+                PhotoPermissionService.shared.libraryDidChangePublisher.send()
                 return true
             }
         } catch {

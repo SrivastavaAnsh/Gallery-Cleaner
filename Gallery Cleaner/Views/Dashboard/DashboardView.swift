@@ -1,9 +1,11 @@
 import SwiftUI
+import Combine
 
 struct DashboardView: View {
     @StateObject private var viewModel = DashboardViewModel()
     @Environment(\.scenePhase) private var scenePhase
     @State private var selectedCategory: CategoryType? = nil
+    @State private var preferredCompactColumn: NavigationSplitViewColumn = .sidebar
     
     // 1 card per row in sidebar
     let sidebarColumns = [
@@ -11,7 +13,7 @@ struct DashboardView: View {
     ]
     
     var body: some View {
-        NavigationSplitView {
+        NavigationSplitView(preferredCompactColumn: $preferredCompactColumn) {
             sidebarContent
                 .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
                 .navigationTitle("Gallery Cleaner")
@@ -24,7 +26,7 @@ struct DashboardView: View {
                 DashboardSummaryView(
                     viewModel: viewModel,
                     onSelectCategory: { category in
-                        selectedCategory = category
+                        selectCategory(category)
                     }
                 )
             }
@@ -38,6 +40,11 @@ struct DashboardView: View {
                 viewModel.permissionService.updatePermissionState()
             }
         }
+    }
+    
+    private func selectCategory(_ category: CategoryType) {
+        selectedCategory = category
+        preferredCompactColumn = .detail
     }
     
     private var sidebarContent: some View {
@@ -98,7 +105,7 @@ struct DashboardView: View {
                     LazyVGrid(columns: sidebarColumns, spacing: 14) {
                         ForEach(CategoryType.allCases) { category in
                             Button(action: {
-                                selectedCategory = category
+                                selectCategory(category)
                             }) {
                                 CategoryCardView(
                                     category: category,
@@ -120,48 +127,58 @@ struct DashboardView: View {
     
     private func destinationView(for category: CategoryType) -> CategoryDetailView {
         let vm: CategoryDetailViewModel
+        let deletionCallback: (Set<String>) -> Void = { deletedIDs in
+            viewModel.handleAssetsDeleted(deletedIDs: deletedIDs)
+        }
+        
         switch category {
         case .screenshots:
             vm = CategoryDetailViewModel(
                 category: category,
                 items: viewModel.screenshots,
                 isScanning: viewModel.isScanning,
-                isAuthorized: viewModel.isAuthorized
+                isAuthorized: viewModel.isAuthorized,
+                onAssetsDeleted: deletionCallback
             )
         case .videos:
             vm = CategoryDetailViewModel(
                 category: category,
                 items: viewModel.videos,
                 isScanning: viewModel.isScanning,
-                isAuthorized: viewModel.isAuthorized
+                isAuthorized: viewModel.isAuthorized,
+                onAssetsDeleted: deletionCallback
             )
         case .duplicatePhotos:
             vm = CategoryDetailViewModel(
                 category: category,
                 groups: viewModel.duplicatePhotoGroups,
                 isScanning: viewModel.isScanning,
-                isAuthorized: viewModel.isAuthorized
+                isAuthorized: viewModel.isAuthorized,
+                onAssetsDeleted: deletionCallback
             )
         case .similarPhotos:
             vm = CategoryDetailViewModel(
                 category: category,
                 groups: viewModel.similarPhotoGroups,
                 isScanning: viewModel.isScanning,
-                isAuthorized: viewModel.isAuthorized
+                isAuthorized: viewModel.isAuthorized,
+                onAssetsDeleted: deletionCallback
             )
         case .duplicateVideos:
             vm = CategoryDetailViewModel(
                 category: category,
                 groups: viewModel.duplicateVideoGroups,
                 isScanning: viewModel.isScanning,
-                isAuthorized: viewModel.isAuthorized
+                isAuthorized: viewModel.isAuthorized,
+                onAssetsDeleted: deletionCallback
             )
         case .largeVideos:
             vm = CategoryDetailViewModel(
                 category: category,
                 items: viewModel.largeVideos,
                 isScanning: viewModel.isScanning,
-                isAuthorized: viewModel.isAuthorized
+                isAuthorized: viewModel.isAuthorized,
+                onAssetsDeleted: deletionCallback
             )
         }
         

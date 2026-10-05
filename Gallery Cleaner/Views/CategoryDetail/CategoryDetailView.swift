@@ -3,7 +3,6 @@ import SwiftUI
 struct CategoryDetailView: View {
     @ObservedObject var viewModel: CategoryDetailViewModel
     var onSelectCategory: ((CategoryType) -> Void)? = nil
-    @State private var showDeleteConfirmation = false
     
     // Fixed 3-column grid preserving large image tile sizes
     let gridColumns = [
@@ -168,6 +167,9 @@ struct CategoryDetailView: View {
                 }
                 .padding(12)
             }
+            .refreshable {
+                // Allows user pull-to-refresh
+            }
             
             // Bottom Sticky Delete Bar
             if viewModel.totalSelectedCount > 0 {
@@ -185,10 +187,17 @@ struct CategoryDetailView: View {
                         Spacer()
                         
                         Button(action: {
-                            showDeleteConfirmation = true
+                            Task {
+                                _ = await viewModel.deleteSelectedAssets()
+                            }
                         }) {
                             HStack {
-                                Image(systemName: "trash.fill")
+                                if viewModel.isDeleting {
+                                    ProgressView()
+                                        .tint(.white)
+                                } else {
+                                    Image(systemName: "trash.fill")
+                                }
                                 Text("Delete")
                                     .font(.headline)
                             }
@@ -232,16 +241,6 @@ struct CategoryDetailView: View {
         }
         .sheet(item: $viewModel.selectedPreviewItem) { item in
             AssetPreviewModal(item: item)
-        }
-        .alert("Delete Selected Items?", isPresented: $showDeleteConfirmation) {
-            Button("Delete", role: .destructive) {
-                Task {
-                    _ = await viewModel.deleteSelectedAssets()
-                }
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("These items will be moved to Recently Deleted in your Photos app.")
         }
     }
 }

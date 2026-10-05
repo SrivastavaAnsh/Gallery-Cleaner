@@ -110,11 +110,14 @@ final class PhotoPermissionService: NSObject, ObservableObject, PHPhotoLibraryCh
         PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: rootViewController)
     }
     
+    let libraryDidChangePublisher = PassthroughSubject<Void, Never>()
+
     // MARK: - PHPhotoLibraryChangeObserver
     
     nonisolated func photoLibraryDidChange(_ changeInstance: PHChange) {
         Task { @MainActor in
             self.updatePermissionState()
+            self.libraryDidChangePublisher.send()
         }
     }
 }

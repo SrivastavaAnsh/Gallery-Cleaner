@@ -176,6 +176,9 @@ struct DashboardSummaryView: View {
             }
             .padding(24)
         }
+        .refreshable {
+            await viewModel.startScan()
+        }
         .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
     }
 }
