@@ -4,8 +4,10 @@ struct DashboardSummaryView: View {
     @ObservedObject var viewModel: DashboardViewModel
     let onSelectCategory: (CategoryType) -> Void
     
+    // 2-column flex grid matching Image 2 layout
     let gridColumns = [
-        GridItem(.adaptive(minimum: 240, maximum: 340), spacing: 16)
+        GridItem(.flexible(), spacing: 14),
+        GridItem(.flexible(), spacing: 14)
     ]
     
     var body: some View {
@@ -55,7 +57,7 @@ struct DashboardSummaryView: View {
                 // Hero Reclaimable Card
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("TOTAL CLEANABLE SPACE")
+                        Text("TOTAL RECLAIMABLE SPACE")
                             .font(.caption2.bold())
                             .foregroundColor(.secondary)
                         
@@ -96,83 +98,29 @@ struct DashboardSummaryView: View {
                     LoadingProgressView(progress: viewModel.scanProgress, statusText: viewModel.scanStatusText)
                 }
                 
-                // Categories Overview Grid
+                // Categories Overview Grid (2 Columns matching Image 2)
                 VStack(alignment: .leading, spacing: 14) {
                     Text("Category Breakdown")
                         .font(.title2.bold())
                         .foregroundColor(.primary)
                     
-                    LazyVGrid(columns: gridColumns, spacing: 16) {
+                    LazyVGrid(columns: gridColumns, spacing: 14) {
                         ForEach(CategoryType.allCases) { category in
                             Button(action: {
                                 onSelectCategory(category)
                             }) {
-                                HStack(spacing: 14) {
-                                    ZStack {
-                                        Circle()
-                                            .fill(category.accentColor.opacity(0.15))
-                                            .frame(width: 48, height: 48)
-                                        
-                                        Image(systemName: category.iconName)
-                                            .font(.title3.bold())
-                                            .foregroundColor(category.accentColor)
-                                    }
-                                    
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(category.title)
-                                            .font(.headline)
-                                            .foregroundColor(.primary)
-                                        
-                                        if let count = viewModel.categoryCounts[category] {
-                                            Text("\(count) items")
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        } else {
-                                            Text("Scanning...")
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        }
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    if let size = viewModel.categorySizes[category], size > 0 {
-                                        StorageBadgeView(text: ByteFormatter.format(size), color: category.accentColor)
-                                    }
-                                    
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption.bold())
-                                        .foregroundColor(.secondary.opacity(0.5))
-                                }
-                                .padding(16)
-                                .background(Color(UIColor.secondarySystemGroupedBackground))
-                                .cornerRadius(18)
-                                .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
+                                CategoryCardView(
+                                    category: category,
+                                    itemCount: viewModel.categoryCounts[category],
+                                    sizeBytes: viewModel.categorySizes[category],
+                                    isLoading: viewModel.isScanning && (viewModel.categoryCounts[category] == nil),
+                                    isSelected: false
+                                )
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
                     }
                 }
-                
-                // Cleanup Tip Banner
-                HStack(spacing: 16) {
-                    Image(systemName: "sparkles")
-                        .font(.title)
-                        .foregroundColor(.purple)
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Smart Cleanup Tip")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                        
-                        Text("Duplicate Photos and Large Videos usually account for the largest space savings. Review those first!")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-                .padding(18)
-                .background(Color.purple.opacity(0.08))
-                .cornerRadius(20)
             }
             .padding(24)
         }

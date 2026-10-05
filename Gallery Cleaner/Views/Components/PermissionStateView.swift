@@ -89,6 +89,7 @@ struct PermissionStateView: View {
                         .background(Color.blue.opacity(0.12))
                         .cornerRadius(10)
                 }
+                .buttonStyle(BorderlessButtonStyle())
                 
                 Button(action: {
                     permissionService.openAppSettings()
@@ -101,6 +102,7 @@ struct PermissionStateView: View {
                         .background(Color.blue)
                         .cornerRadius(10)
                 }
+                .buttonStyle(BorderlessButtonStyle())
             }
             
         case .restricted:
