@@ -7,6 +7,7 @@ struct MediaItemCell: View {
     let onPreview: () -> Void
     
     @State private var thumbnail: UIImage? = nil
+    @State private var currentAssetID: String? = nil
     @State private var requestID: PHImageRequestID? = nil
     
     var body: some View {
@@ -76,18 +77,25 @@ struct MediaItemCell: View {
         .aspectRatio(1, contentMode: .fit)
         .cornerRadius(12)
         .onAppear {
+            loadThumbnailIfNeeded()
+        }
+        .onChange(of: item.id) {
             loadThumbnail()
         }
-        .onDisappear {
-            if let id = requestID {
-                ImageCacheManager.shared.cancelRequest(id)
-            }
+    }
+    
+    private func loadThumbnailIfNeeded() {
+        if thumbnail == nil || currentAssetID != item.id {
+            loadThumbnail()
         }
     }
     
     private func loadThumbnail() {
+        currentAssetID = item.id
         requestID = ImageCacheManager.shared.requestThumbnail(for: item.asset) { img in
-            self.thumbnail = img
+            if let img = img {
+                self.thumbnail = img
+            }
         }
     }
 }

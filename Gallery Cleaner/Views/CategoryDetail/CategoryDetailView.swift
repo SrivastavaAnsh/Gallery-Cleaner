@@ -1,4 +1,5 @@
 import SwiftUI
+import Photos
 
 struct CategoryDetailView: View {
     @ObservedObject var viewModel: CategoryDetailViewModel
@@ -242,6 +243,27 @@ struct CategoryDetailView: View {
         }
         .sheet(item: $viewModel.selectedPreviewItem) { item in
             AssetPreviewModal(item: item)
+        }
+        .onAppear {
+            precacheAssets()
+        }
+        .onChange(of: viewModel.items) {
+            precacheAssets()
+        }
+        .onChange(of: viewModel.groups) {
+            precacheAssets()
+        }
+    }
+    
+    private func precacheAssets() {
+        let assets: [PHAsset]
+        if !viewModel.groups.isEmpty {
+            assets = viewModel.groups.flatMap { $0.items.map(\.asset) }
+        } else {
+            assets = viewModel.items.map(\.asset)
+        }
+        if !assets.isEmpty {
+            ImageCacheManager.shared.startCaching(assets: assets)
         }
     }
 }
