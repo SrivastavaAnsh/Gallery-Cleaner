@@ -3,6 +3,7 @@ import SwiftUI
 struct CategoryDetailView: View {
     @ObservedObject var viewModel: CategoryDetailViewModel
     var onSelectCategory: ((CategoryType) -> Void)? = nil
+    var onRefresh: (() async -> Void)? = nil
     
     // Fixed 3-column grid preserving large image tile sizes
     let gridColumns = [
@@ -168,7 +169,7 @@ struct CategoryDetailView: View {
                 .padding(12)
             }
             .refreshable {
-                // Allows user pull-to-refresh
+                await onRefresh?()
             }
             
             // Bottom Sticky Delete Bar

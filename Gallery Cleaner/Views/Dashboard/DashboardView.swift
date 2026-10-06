@@ -123,6 +123,9 @@ struct DashboardView: View {
             }
             .padding(16)
         }
+        .refreshable {
+            await viewModel.startScan()
+        }
     }
     
     private func destinationView(for category: CategoryType) -> CategoryDetailView {
@@ -186,6 +189,9 @@ struct DashboardView: View {
             viewModel: vm,
             onSelectCategory: { newCategory in
                 selectedCategory = newCategory
+            },
+            onRefresh: {
+                await viewModel.startScan()
             }
         )
     }
