@@ -7,10 +7,10 @@ A high-performance, privacy-focused native iOS app built with **SwiftUI**, **Pho
 ## ✨ Key Features
 
 * 📊 **Reclaimable Storage Calculation**: Instantly computes total wasted storage space and breakdown per category.
-* ⚡ **Pull-to-Refresh & Rescan**: Drag down on any page or tap **Rescan** to perform a complete disk library re-analysis.
-* 🛡 **Full & Limited Permission Support**: Gracefully handles iOS photo authorization states (`authorized`, `limited`, `denied`, `restricted`) with in-app settings guidance.
+* 🛡 **Full & Limited Permission Support**: Gracefully handles iOS photo authorization states (`authorized`, `limited`, `denied`) with in-app settings guidance.
+* 🗑 **Batch Deletion**: Safely removes selected assets from the device using iOS Photo Library confirmation prompts.
 * ✨ **"Keep Best" Smart Selection**: Auto-selects redundant duplicate/similar items for deletion while preserving the newest / best photo untouched.
-* 🗑 **Batch Deletion**: Safely removes selected assets from the device using native iOS Photo Library confirmation prompts.
+* ⚡ **Pull-to-Refresh & Rescan**: Drag down on any page or tap **Rescan** to perform a complete disk library re-analysis.
 * ⚡ **High-Speed Thumbnail Caching**: Instant rendering of media grids backed by `PHCachingImageManager` pre-caching.
 
 ---
@@ -52,37 +52,37 @@ The project follows the **MVVM (Model-View-ViewModel)** architectural pattern:
 ```text
 Gallery Cleaner/
 ├── App/
-│   └── ContentView.swift            # Main entry point & NavigationSplitView root
+│   └── ContentView.swift                    # Main entry point & NavigationSplitView root
 ├── Models/
-│   ├── MediaItem.swift              # PHAsset wrapper with metadata & selection state
-│   ├── MediaGroup.swift             # Grouping model for duplicates & similar items
-│   └── CategoryType.swift           # Category enum definition & UI theme attributes
+│   ├── MediaItem.swift                      # PHAsset wrapper with metadata & selection state
+│   ├── MediaGroup.swift                     # Grouping model for duplicates & similar items
+│   └── CategoryType.swift                   # Category enum definition & UI theme attributes
 ├── ViewModels/
-│   ├── DashboardViewModel.swift     # Core scanning engine & storage metrics publisher
-│   └── CategoryDetailViewModel.swift# Category selection, batch deletion & smart defaults
+│   ├── DashboardViewModel.swift             # Core scanning engine & storage metrics publisher
+│   └── CategoryDetailViewModel.swift        # Category selection, batch deletion & smart defaults
 ├── Services/
-│   ├── PhotoLibraryManager.swift    # Asset fetching & PHPhotoLibrary deletion engine
-│   ├── PhotoPermissionService.swift # Observer for authorization states & settings link
-│   ├── DuplicatePhotoAnalysisService.swift # SHA-256 photo fingerprinting
-│   ├── DuplicateVideoAnalysisService.swift # Sample buffer SHA-256 video fingerprinting
-│   └── SimilarPhotoAnalysisService.swift   # Apple Vision visual similarity engine
+│   ├── PhotoLibraryManager.swift            # Asset fetching & PHPhotoLibrary deletion engine
+│   ├── PhotoPermissionService.swift         # Observer for authorization states & settings link
+│   ├── DuplicatePhotoAnalysisService.swift  # SHA-256 photo fingerprinting
+│   ├── DuplicateVideoAnalysisService.swift  # Sample buffer SHA-256 video fingerprinting
+│   └── SimilarPhotoAnalysisService.swift    # Apple Vision visual similarity engine
 ├── Views/
 │   ├── Dashboard/
-│   │   ├── DashboardView.swift        # Split-view sidebar & dashboard container
-│   │   ├── DashboardSummaryView.swift # Detailed overview grid & rescan header
-│   │   └── CategoryCardView.swift     # Individual category statistics card
+│   │   ├── DashboardView.swift              # Split-view sidebar & dashboard container
+│   │   ├── DashboardSummaryView.swift       # Detailed overview grid & rescan header
+│   │   └── CategoryCardView.swift           # Individual category statistics card
 │   ├── CategoryDetail/
-│   │   ├── CategoryDetailView.swift   # 3-column media grid with quick actions & sticky bar
-│   │   ├── GroupHeaderView.swift      # Duplicate/Similar group header badge
-│   │   └── MediaItemCell.swift        # High-performance grid cell with thumbnail loader
+│   │   ├── CategoryDetailView.swift         # 3-column media grid with quick actions & sticky bar
+│   │   ├── GroupHeaderView.swift            # Duplicate/Similar group header badge
+│   │   └── MediaItemCell.swift              # High-performance grid cell with thumbnail loader
 │   └── Components/
-│       ├── StorageBadgeView.swift     # Storage indicator component
-│       ├── LoadingProgressView.swift  # Scan status progress bar
-│       ├── PermissionStateView.swift  # Authorization warning & call-to-action view
-│       └── AssetPreviewModal.swift    # Fullscreen asset inspector modal
+│       ├── StorageBadgeView.swift           # Storage indicator component
+│       ├── LoadingProgressView.swift        # Scan status progress bar
+│       ├── PermissionStateView.swift        # Authorization warning & call-to-action view
+│       └── AssetPreviewModal.swift          # Fullscreen asset inspector modal
 └── Utilities/
-    ├── ImageCacheManager.swift       # PHCachingImageManager wrapper
-    └── ByteFormatter.swift           # File size string formatting utility
+    ├── ImageCacheManager.swift              # PHCachingImageManager wrapper
+    └── ByteFormatter.swift                  # File size string formatting utility
 ```
 
 ---
