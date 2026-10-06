@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "logo92.png",
+      "filename" : "GalleryCleaner_AppIcon_1024.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,7 +13,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "logo92 1.png",
+      "filename" : "GalleryCleaner_AppIcon_1024 1.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -25,7 +25,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "logo92 2.png",
+      "filename" : "GalleryCleaner_AppIcon_1024 2.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -116,7 +116,7 @@
       "size" : "83.5x83.5"
     },
     {
-      "filename" : "logo92.png",
+      "filename" : "GalleryCleaner_AppIcon_1024 3.png",
       "idiom" : "ios-marketing",
       "scale" : "1x",
       "size" : "1024x1024"

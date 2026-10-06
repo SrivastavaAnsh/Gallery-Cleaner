@@ -77,32 +77,19 @@ struct PermissionStateView: View {
             }
             
         case .limited:
-            HStack(spacing: 12) {
-                Button(action: {
-                    permissionService.presentLimitedLibraryPicker()
-                }) {
-                    Text("Manage Selection")
-                        .font(.caption.bold())
-                        .foregroundColor(.blue)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .background(Color.blue.opacity(0.12))
-                        .cornerRadius(10)
-                }
-                .buttonStyle(BorderlessButtonStyle())
-                
-                Button(action: {
-                    permissionService.openAppSettings()
-                }) {
+            Button(action: {
+                permissionService.openAppSettings()
+            }) {
+                HStack {
+                    Image(systemName: "gear")
                     Text("Grant Full Access")
-                        .font(.caption.bold())
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .background(Color.blue)
-                        .cornerRadius(10)
                 }
-                .buttonStyle(BorderlessButtonStyle())
+                .font(.subheadline.bold())
+                .foregroundColor(.white)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(Color.blue)
+                .cornerRadius(12)
             }
             
         case .restricted:
