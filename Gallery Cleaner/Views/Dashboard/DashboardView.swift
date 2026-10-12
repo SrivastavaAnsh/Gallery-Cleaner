@@ -16,7 +16,7 @@ struct DashboardView: View {
         NavigationSplitView(preferredCompactColumn: $preferredCompactColumn) {
             sidebarContent
                 .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
-                .navigationTitle("Gallery Cleaner")
+                .navigationTitle("Swoop")
                 .navigationBarTitleDisplayMode(.large)
         } detail: {
             if let category = selectedCategory {

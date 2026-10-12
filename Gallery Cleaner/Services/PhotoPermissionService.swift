@@ -32,13 +32,13 @@ enum PhotoPermissionState {
     var statusDescription: String {
         switch self {
         case .notDetermined:
-            return "Gallery Cleaner needs permission to scan your library for duplicate photos, videos, and screenshots to free up storage space."
+            return "Swoop needs permission to scan your library for duplicate photos, videos, and screenshots to free up storage space."
         case .authorized:
             return "Full access allows complete detection of duplicate photos, videos, and large media files."
         case .limited:
             return "You granted limited photo access. Only selected photos can be scanned. For full gallery cleaning, grant Full Access in Settings."
         case .denied:
-            return "Photo library access is turned off for Gallery Cleaner. Please enable access in iOS Settings to scan your photos."
+            return "Photo library access is turned off for Swoop. Please enable access in iOS Settings to scan your photos."
         case .restricted:
             return "Photo library access is restricted on this device (e.g., due to parental controls or device policy)."
         }
@@ -94,7 +94,7 @@ final class PhotoPermissionService: NSObject, ObservableObject, PHPhotoLibraryCh
         }
     }
     
-    /// Opens the iOS Settings app for Gallery Cleaner
+    /// Opens the iOS Settings app for Swoop
     func openAppSettings() {
         guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
         if UIApplication.shared.canOpenURL(settingsURL) {

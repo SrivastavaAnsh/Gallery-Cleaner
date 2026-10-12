@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main 
-struct GalleryCleanerApp: App {
+struct SwoopApp: App {
     var body: some Scene {
         WindowGroup {
             DashboardView()
